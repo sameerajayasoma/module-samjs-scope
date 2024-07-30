@@ -23,7 +23,7 @@ You can create a new scope using the `bind` function:
 
 ```ballerina
 scope:Scope parentScope = scope:rootScope();
-scope:Scope newScope = scope:bind("key", "value", parentScope);
+scope:Scope newScope = parentScope.bind("key", "value");
 ```
 
 ### Retrieving Values
@@ -43,8 +43,8 @@ import samjs/scope;
 
 public function main() {
     scope:Scope rootScope = scope:rootScope();
-    scope:Scope childScope = scope:bind("userID", "12345", rootScope);
-    scope:Scope grandchildScope = scope:bind("sessionID", "abcde", childScope);
+    scope:Scope childScope = rootScope.bind("userID", "12345");
+    scope:Scope grandchildScope = childScope.bind("sessionID", "abcde");
 
     string userID = check grandchildScope.value("userID").ensureType();
     string sessionID = check grandchildScope.value("sessionID").ensureType();

@@ -20,7 +20,7 @@ public isolated class Scope {
     # + key - The key associated with this scope
     # + value - The value associated with this scope
     # + parent - The parent scope, if any
-    isolated function init(string? key, ScopeValue? value, Scope? parent) {
+    isolated function init(Scope? parent, string? key, ScopeValue? value) {
         self.parent = parent;
         self.key = key;
         if value is value:Cloneable {
@@ -37,7 +37,7 @@ public isolated class Scope {
     # Retrieves the value associated with the given key from the current scope or its ancestors.
     #
     # + key - The key to look up
-    # + return - The value associated with the key, or panics if the key is not found
+    # + return - The value associated with the key, or () if the key is not found
     public isolated function value(string key) returns ScopeValue {
         if key == self.key {
             lock {
@@ -55,8 +55,17 @@ public isolated class Scope {
             }
         }
 
-        panic error("Key not found", key = key);
+        return ();
     };
+
+    # Creates a new scope with the given key, value, and parent scope.
+    #
+    # + key - The key for the new scope
+    # + value - The value associated with the key
+    # + return - A new Scope instance
+    public isolated function bind(string key, ScopeValue value) returns Scope {
+        return new Scope(self, key, value);
+    }
 }
 
 # Creates a new root scope.
@@ -65,16 +74,6 @@ public isolated class Scope {
 #
 # + return - A new Scope instance
 public isolated function rootScope() returns Scope {
-    return new Scope(null, null, ());
-}
-
-# Creates a new scope with the given key, value, and parent scope.
-#
-# + key - The key for the new scope
-# + value - The value associated with the key
-# + parent - The parent scope
-# + return - A new Scope instance
-public isolated function bind(string key, ScopeValue value, Scope parent) returns Scope {
-    return new Scope(key, value, parent);
+    return new Scope((), (), ());
 }
 
